@@ -143,6 +143,48 @@ form.save input{flex:1 1 12rem;font:inherit;padding:.75rem 1rem;border-radius:99
 .mode span{color:var(--muted);font-size:.92rem;line-height:1.35}
 .mode[aria-checked="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 
+/* science + lab sections */
+.learn{margin-top:3.5rem}
+.learn h2{font-size:clamp(1.8rem,6.5vw,2.5rem);line-height:1.05;letter-spacing:-.02em;margin-bottom:1rem}
+.steps{list-style:none;margin:1.5rem 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.steps li{background:var(--surface);border-radius:18px;padding:1rem 1rem 1.1rem;border-top:6px solid var(--tc)}
+.steps b{display:block;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.25rem;margin-bottom:.3rem}
+.steps p{margin:0;font-size:.98rem;line-height:1.45}
+.demo{background:var(--surface);border-radius:18px;padding:.25rem 1rem 1rem;margin:1.25rem 0 1.5rem}
+.demo .track{--d:18px;padding-top:calc(var(--rise)*2 + 14px)}
+.demo p{margin:.75rem 0 0;font-size:.95rem;color:var(--muted)}
+.dot.surprise{scale:1.5}
+.lab{margin-top:3rem;padding-top:2rem;border-top:2px solid var(--line)}
+.lab h2{font-size:1.6rem}
+.lab a{color:var(--ink);font-weight:700}
+.small{font-size:.9rem;color:var(--muted)}
+.fact{background:var(--surface);border-radius:16px;padding:.9rem 1.1rem;border-left:6px solid var(--b);max-width:none;margin:1.25rem 0 0}
+.fact b{font-family:"Bricolage Grotesque",system-ui,sans-serif}
+@media (max-width:560px){.steps{grid-template-columns:1fr}}
+
+/* inside your brain page */
+.page-title{font-size:clamp(2.4rem,9vw,3.8rem)}
+#brain h2{margin-top:2.5rem;font-size:clamp(1.5rem,5vw,2rem);line-height:1.1}
+h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.35rem;margin:0 0 .4rem}
+.flow{display:grid;gap:.45rem;margin:1.25rem 0 1.5rem;max-width:28rem}
+.flow .box{background:var(--surface);border-radius:14px;padding:.7rem 1rem;font-weight:700}
+.flow .box small{display:block;font-weight:400;color:var(--muted);font-size:.92rem}
+.flow .arrows{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap}
+.flow .arrows span{background:var(--tc);color:var(--on);border-radius:999px;padding:.2rem .75rem;font-weight:700;font-size:.92rem}
+.bands{display:grid;gap:.5rem;margin:1rem 0 1.5rem}
+.band{display:grid;grid-template-columns:6.5rem 1fr;column-gap:.9rem;row-gap:.25rem;align-items:center;background:var(--surface);border-radius:14px;padding:.65rem .9rem}
+.band b{display:block;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.1rem;line-height:1.1}
+.band .hz{font-size:.85rem;color:var(--muted)}
+.band svg{width:100%;height:28px;display:block;color:var(--tc)}
+.band p{grid-column:1 / -1;margin:0;font-size:.95rem;line-height:1.45}
+.demo-card{background:var(--surface);border-radius:22px;padding:1.1rem 1.1rem 1.25rem;margin:1.5rem 0}
+.demo-card canvas{width:100%;height:170px;display:block;border-radius:12px;background:var(--bg);margin:.75rem 0 .6rem}
+.readout{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:600;font-size:1.1rem;min-height:1.6rem;margin:0 0 .8rem}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);padding:.6rem 1rem;font-weight:700}
+.seg button[aria-checked="true"]{background:var(--ink);color:var(--bg)}
+.demo-card .small{margin:.85rem 0 0}
+
 @media (max-width:420px){
   :root{--d:12px;--rise:18px}
   .wrap{padding-top:1.75rem}
@@ -183,12 +225,43 @@ form.save input{flex:1 1 12rem;font:inherit;padding:.75rem 1rem;border-radius:99
       <button class="mode" role="radio" aria-checked="true" data-mode="easy"><b>Easy</b><span>Slower beeps, notes further apart, simpler patterns</span></button>
       <button class="mode" role="radio" aria-checked="false" data-mode="hard"><b>Hard</b><span>Faster beeps, closer notes, hidden rules</span></button>
     </div>
-    <div class="row"><button class="btn" id="startBtn">Start game</button></div>
+    <div class="row"><button class="btn" id="startBtn">Start game</button><button class="linkish" id="learnTop">How does your brain do this?</button><button class="linkish" data-brain>Brain waves</button></div>
 
     <div class="board">
       <h2 data-board-title>Best scores on this device</h2>
       <div data-board></div>
     </div>
+
+    <article class="learn" id="science">
+      <h2>Your brain is a prediction machine</h2>
+      <p>Your brain doesn’t just wait for sounds to arrive. It’s always guessing what’s coming next. When you heard A, A, A in the game, your brain was already getting ready for another A before it played.</p>
+      <p>Scientists call this <strong>predictive coding</strong>. It works in three steps, over and over, many times a second:</p>
+      <ol class="steps">
+        <li class="t0"><b>Guess</b><p>Your brain uses what it has heard so far to predict the next sound.</p></li>
+        <li class="t1"><b>Check</b><p>When the sound arrives, your brain compares it with its guess.</p></li>
+        <li class="t2"><b>Update</b><p>If the guess was wrong, a “surprise” signal fires, and your brain changes its guess for next time.</p></li>
+      </ol>
+      <p>That surprise signal is something scientists can measure. Have a listen:</p>
+      <div class="demo">
+        <div class="track" id="demoTrack" aria-hidden="true"></div>
+        <button class="btn ghost" id="demoBtn">Hear a surprise</button>
+        <p>Four Bs, then a C. Brain cells respond more strongly to the C, because it broke the pattern your brain had spotted.</p>
+      </div>
+      <p>Why bother predicting? It saves effort, because your brain only needs to pay close attention to the surprises. Predictions help you follow a conversation in a noisy room, catch a ball, and enjoy music, which is full of patterns that a good song sometimes breaks on purpose.</p>
+      <p>The harder levels hide the pattern inside groups, or link notes that aren’t next to each other. Your brain can learn these too. It’s a bit like how you learned the rules of your language just by listening, long before anyone explained grammar to you.</p>
+
+      <p>Want to see what brain cells are actually doing while they predict? Explore spikes, brain waves and how they keep time with a beat.</p>
+      <div class="row"><button class="btn ghost" data-brain>Go inside your brain</button></div>
+
+      <section class="lab" aria-labelledby="labTitle">
+        <h2 id="labTitle">Who made this game</h2>
+        <p>This game comes from the Cognitive and Translational Neuroscience Lab at Newcastle University, led by Professor Yuki Kikuchi.</p>
+        <p>We study how the brain hears, remembers and makes sense of sounds, including speech and animal calls. We want to understand the brain circuits that let us predict what we’ll hear next, and use what we learn to help develop treatments for conditions that affect the brain and mental health.</p>
+        <p>To do this, we listen in on the activity of brain cells, take pictures of the brain with MRI scanners, and run listening experiments a lot like this game.</p>
+        <p><a href="https://research.ncl.ac.uk/ctn/" target="_blank" rel="noopener">Find out more about the lab</a></p>
+        <p class="small">Our research is funded by the Medical Research Council, the Biotechnology and Biological Sciences Research Council, the Engineering and Physical Sciences Research Council and the British Council.</p>
+      </section>
+    </article>
   </section>
 
   <!-- GAME -->
@@ -231,6 +304,7 @@ form.save input{flex:1 1 12rem;font:inherit;padding:.75rem 1rem;border-radius:99
     <h2>Game over</h2>
     <p class="big" id="finalScore">0</p>
     <p id="finalLine" class="muted"></p>
+    <p class="fact" id="fact"></p>
     <form class="save" id="saveForm" hidden>
       <input id="nameInput" maxlength="16" autocomplete="off" placeholder="Your name for the leaderboard" aria-label="Your name">
       <button class="btn" type="submit">Save score</button>
@@ -238,11 +312,74 @@ form.save input{flex:1 1 12rem;font:inherit;padding:.75rem 1rem;border-radius:99
     <div class="row" style="margin-top:1.25rem">
       <button class="btn" id="againBtn">Play again</button>
       <button class="btn ghost" id="menuBtn">Change mode</button>
+      <button class="linkish" id="learnBtn">How does my brain do this?</button>
     </div>
     <div class="board">
       <h2 data-board-title>Best scores on this device</h2>
       <div data-board></div>
     </div>
+  </section>
+
+  <!-- INSIDE YOUR BRAIN -->
+  <section id="brain" hidden>
+    <div class="row"><button class="linkish" data-back>Back to the game</button></div>
+    <h1 class="page-title">Inside your brain</h1>
+    <p class="lede">What are brain cells actually doing when you predict the next beep? Let’s look at their electrical activity, and the waves it makes.</p>
+
+    <h2>Brain cells talk in tiny sparks</h2>
+    <p>Your brain has about 86 billion brain cells, called neurons. They send messages to each other using tiny pulses of electricity called spikes. One neuron can fire many spikes every second.</p>
+    <p>Scientists think the brain uses these spikes to send two kinds of message, travelling in opposite directions:</p>
+    <div class="flow" role="img" aria-label="Diagram: guesses travel down from thinking areas to hearing areas, and surprises travel back up. Sound comes in from the ears.">
+      <div class="box">Thinking areas<small>make guesses about what’s coming</small></div>
+      <div class="arrows"><span class="t0">↓ Guesses travel down</span><span class="t2">↑ Surprises travel up</span></div>
+      <div class="box">Hearing areas<small>compare the guess with the real sound</small></div>
+      <div class="arrows"><span class="t1">↑ Sound comes in</span></div>
+      <div class="box">Your ears</div>
+    </div>
+    <p>When a pattern is easy to predict, the guess matches what arrives, so there’s very little surprise to send up. When something unexpected happens, a burst of surprise signals travels up, and the thinking areas change their guess.</p>
+
+    <h2>Brain waves</h2>
+    <p>When thousands of neurons fire together in time, their activity rises and falls together, like a Mexican wave in a football stadium. No single fan is the wave, but together they make one you can see from across the ground.</p>
+    <p>These rhythms are called brain waves, or oscillations. They’re strong enough to pick up with sensors on the outside of your head, using a method called EEG. They come in different speeds, measured in hertz (Hz), which means waves per second. Here’s half a second of each:</p>
+    <div class="bands" id="bands"></div>
+
+    <div class="demo-card">
+      <h3>Catch the beat</h3>
+      <p>Slow brain waves can line up with a rhythm, so their peaks land right when the next sound is due. That’s your brain predicting <em>when</em> something will happen, not just <em>what</em>.</p>
+      <canvas id="beatCanvas" aria-label="A brain wave drawn over time, with a dot for each beat"></canvas>
+      <p class="readout" id="syncText" aria-live="polite">Press start to play a beat.</p>
+      <div class="row">
+        <button class="btn" id="beatStart">Start the beat</button>
+        <div class="seg" role="radiogroup" aria-label="Beat type" id="beatSeg">
+          <button role="radio" aria-checked="true" data-val="steady">Steady</button>
+          <button role="radio" aria-checked="false" data-val="wobbly">Wobbly</button>
+        </div>
+        <button class="btn ghost" id="beatSkip" disabled>Skip a beat</button>
+      </div>
+      <p class="small">Try this: let the wave lock on, then skip a beat. The wave still peaks where the beat should have been. Then try a wobbly beat that’s hard to predict.</p>
+    </div>
+
+    <div class="demo-card">
+      <h3>Push the swing</h3>
+      <p>If you push a swing at the top of its swing, it goes higher. Push at the wrong moment and it slows down. Playing a sound at the right moment can do something similar to a brain wave.</p>
+      <canvas id="swingCanvas" aria-label="A slow brain wave, with a dot each time a sound is played"></canvas>
+      <p class="readout" id="swingText" aria-live="polite">Press “Play a sound” when the wave is at its peak.</p>
+      <div class="row">
+        <button class="btn" id="swingTap">Play a sound</button>
+        <div class="seg" role="radiogroup" aria-label="Computer timing" id="swingSeg">
+          <button role="radio" aria-checked="true" data-val="off">You</button>
+          <button role="radio" aria-checked="false" data-val="peaks">Auto: peaks</button>
+          <button role="radio" aria-checked="false" data-val="troughs">Auto: dips</button>
+        </div>
+      </div>
+      <p class="small">Keyboard: the space bar plays a sound. The auto settings let the computer watch the wave and do the timing for you.</p>
+    </div>
+
+    <h2>How our lab studies this</h2>
+    <p>We record brain waves and the spikes of individual neurons while listeners hear sound patterns like the ones in the game. We look for the guess signals and the surprise signals, and at how brain waves line up with what’s expected.</p>
+    <p>We also use a technique called closed-loop stimulation. It’s like the auto settings in the swing demo: a computer watches a brain wave as it happens and plays a sound at exactly the right moment in the wave. We’re testing whether this can nudge brain rhythms, and the memories and predictions that depend on them. One day, ideas like this might help people whose brain rhythms aren’t working as they should.</p>
+    <p class="small">The waves in these demos are simplified cartoons. Real brain waves are much messier, which is part of what makes them so interesting to study.</p>
+    <div class="row" style="margin-top:1.5rem"><button class="btn" data-back>Back to the game</button></div>
   </section>
 
 </main>
@@ -385,7 +522,7 @@ form.save input{flex:1 1 12rem;font:inherit;padding:.75rem 1rem;border-radius:99
   const ansBtns = [...document.querySelectorAll('.ans')];
   const replayBtn = $('#replayBtn');
 
-  function show(id) { ['start', 'game', 'over'].forEach(s => $('#' + s).hidden = s !== id); window.scrollTo(0, 0); }
+  function show(id) { ['start', 'game', 'over', 'brain'].forEach(s => $('#' + s).hidden = s !== id); window.scrollTo(0, 0); if (id === 'brain') startBrain(); else stopBrain(); }
   function clearTimers() { timers.forEach(clearTimeout); timers = []; }
   function setButtons(on) { ansBtns.forEach(b => { b.disabled = !on; b.classList.remove('mark'); }); replayBtn.disabled = !on || q.replays >= M().replays; }
   function updateHud() {
@@ -502,6 +639,10 @@ form.save input{flex:1 1 12rem;font:inherit;padding:.75rem 1rem;border-radius:99
     const form = $('#saveForm');
     form.hidden = !qualifies(score);
     $('#nameInput').value = '';
+    const f = pick(FACTS);
+    $('#fact').textContent = '';
+    const fb = document.createElement('b'); fb.textContent = 'Brain fact: ';
+    $('#fact').append(fb, f);
     lastSavedId = null;
     renderBoards();
     show('over');
@@ -543,7 +684,181 @@ form.save input{flex:1 1 12rem;font:inherit;padding:.75rem 1rem;border-radius:99
     else if (k === 'r') replayBtn.click();
   });
 
+  // ---------- science section ----------
+  const FACTS = [
+    'Your brain notices an unexpected sound in less than a quarter of a second, often before you realise you heard it.',
+    'Your brain can even notice a missing sound. If a steady beat skips, brain cells respond to the silence where the beat should have been.',
+    'Babies are pattern spotters too. Before they can talk, they notice which sounds tend to follow each other in speech.',
+    'When a sound becomes predictable, the brain’s response to it gets smaller. Your brain stops making a fuss about things it saw coming.',
+    'Music can give you chills partly by playing with your predictions: setting up what you expect, then surprising you or delivering it at just the right moment.',
+    'Monkeys and marmosets can learn sound patterns like the ones in this game, which helps scientists study how prediction works inside the brain.',
+  ];
+  const demoSeq = [1, 1, 1, 1, 2], demoTrack = $('#demoTrack');
+  function drawDemo() {
+    demoTrack.textContent = '';
+    demoSeq.forEach(t => { const d = document.createElement('span'); d.className = 'dot t' + t; demoTrack.appendChild(d); });
+  }
+  drawDemo();
+  let demoTimers = [];
+  $('#demoBtn').addEventListener('click', () => {
+    ensureCtx(); demoTimers.forEach(clearTimeout); demoTimers = []; drawDemo();
+    const f = freqsFor(BASE, 4), t0 = ctx.currentTime + 0.1, dots = demoTrack.querySelectorAll('.dot');
+    demoSeq.forEach((t, i) => {
+      beep(f[t], t0 + i * 0.45);
+      demoTimers.push(setTimeout(() => { dots[i].classList.add('on', 'shown'); if (i === demoSeq.length - 1) dots[i].classList.add('surprise'); }, 100 + i * 450));
+    });
+  });
+  function goLearn() {
+    lastSavedId = null; renderBoards(); show('start');
+    const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    requestAnimationFrame(() => $('#science').scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' }));
+  }
+  $('#learnTop').addEventListener('click', goLearn);
+  $('#learnBtn').addEventListener('click', goLearn);
+
+  // ---------- inside your brain ----------
+  const BANDS = [
+    ['Delta', '1–4 Hz', 2, 't0', 'The slowest waves. Big in deep sleep, and they can keep time with a steady beat.'],
+    ['Theta', '4–8 Hz', 6, 't1', 'Linked to memory, and to following the rhythm of syllables when someone talks.'],
+    ['Alpha', '8–12 Hz', 10, 't2', 'Strong when you’re relaxed with your eyes closed, and when your brain is tuning out distractions.'],
+    ['Beta', '13–30 Hz', 20, 't0', 'Scientists think these help carry guesses down from the thinking areas.'],
+    ['Gamma', '30+ Hz', 40, 't2', 'Fast waves. Scientists think these help carry surprises up from the hearing areas.'],
+  ];
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  BANDS.forEach(([name, hz, f, cls, desc]) => {
+    const el = document.createElement('div'); el.className = 'band ' + cls;
+    const head = document.createElement('div');
+    const b = document.createElement('b'); b.textContent = name;
+    const s = document.createElement('span'); s.className = 'hz'; s.textContent = hz;
+    head.append(b, s);
+    const svg = document.createElementNS(SVGNS, 'svg'); svg.setAttribute('viewBox', '0 0 300 28'); svg.setAttribute('preserveAspectRatio', 'none'); svg.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS(SVGNS, 'path');
+    let d = ''; for (let x = 0; x <= 300; x++) d += (x ? 'L' : 'M') + x + ' ' + (14 - 11 * Math.sin(2 * Math.PI * (f / 2) * x / 300)).toFixed(1);
+    path.setAttribute('d', d); path.setAttribute('fill', 'none'); path.setAttribute('stroke', 'currentColor'); path.setAttribute('stroke-width', '2'); path.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.appendChild(path);
+    const p = document.createElement('p'); p.textContent = desc;
+    el.append(head, svg, p); $('#bands').appendChild(el);
+  });
+
+  const TAU = Math.PI * 2, wrap = p => Math.atan2(Math.sin(p), Math.cos(p));
+  const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const beatCv = $('#beatCanvas'), swingCv = $('#swingCanvas');
+  function fitCanvas(cv) {
+    const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); return { c, w, h };
+  }
+  function drawTrace(cv, samples, marks, tNow, span) {
+    const { c, w, h } = fitCanvas(cv); if (!w) return;
+    c.clearRect(0, 0, w, h);
+    const x = t => w - (tNow - t) / span * w, mid = h * 0.6, amp = h * 0.34;
+    c.strokeStyle = cssVar('--line'); c.lineWidth = 1; c.beginPath(); c.moveTo(0, mid); c.lineTo(w, mid); c.stroke();
+    marks.forEach(m => {
+      const X = x(m.t);
+      c.strokeStyle = m.color; c.lineWidth = 2; c.setLineDash(m.dashed ? [4, 4] : []);
+      c.beginPath(); c.moveTo(X, h * 0.17); c.lineTo(X, h - 6); c.stroke(); c.setLineDash([]);
+      c.beginPath(); c.arc(X, h * 0.1, 6, 0, TAU);
+      if (m.dashed) c.stroke(); else { c.fillStyle = m.color; c.fill(); }
+    });
+    c.strokeStyle = cssVar('--ink'); c.lineWidth = 2.5; c.lineJoin = 'round'; c.beginPath();
+    samples.forEach((s, i) => { const X = x(s.t), Y = mid - s.v * amp; i ? c.lineTo(X, Y) : c.moveTo(X, Y); });
+    c.stroke();
+  }
+  const trim = (arr, span) => { while (arr.length && simT - arr[0].t > span) arr.shift(); };
+  let simT = 0, lastFrame = 0, raf = 0;
+
+  // Catch the beat: a slow oscillator that phase-resets and retunes to each beat
+  const beat = { running: false, mode: 'steady', phase: Math.PI, f: 1.6, a: 0.3, nextBeat: 0, lastBeat: null, interval: 0.5, skipNext: false, samples: [], marks: [], lock: [], holdMsg: 0 };
+  const beatStartBtn = $('#beatStart'), beatSkipBtn = $('#beatSkip'), syncText = $('#syncText');
+  function updateSync() {
+    if (simT < beat.holdMsg) return;
+    if (beat.lock.length < 3) { syncText.textContent = 'Listening…'; return; }
+    let cx = 0, sy = 0; beat.lock.forEach(p => { cx += Math.cos(p); sy += Math.sin(p); });
+    const plv = Math.hypot(cx, sy) / beat.lock.length, pct = Math.round(plv * 100);
+    syncText.textContent = 'In sync with the beat: ' + pct + '%. ' + (pct >= 85 ? 'Locked on! The peaks land on the beat.' : pct >= 60 ? 'Getting there…' : 'Hard to predict, so the wave can’t lock on.');
+  }
+  function stepBeat(dt) {
+    const B = beat;
+    B.phase += TAU * B.f * dt;
+    B.a += (0.3 - B.a) * 0.25 * dt;
+    if (B.running && simT >= B.nextBeat) {
+      const t = B.nextBeat;
+      if (B.skipNext) {
+        B.skipNext = false; B.lastBeat = t;
+        B.marks.push({ t, color: cssVar('--muted'), dashed: true });
+        B.holdMsg = simT + 2.2;
+        syncText.textContent = 'Beat skipped, but the wave still peaked on time. It was expecting a beat!';
+      } else {
+        ensureCtx(); beep(freqsFor(BASE, 4)[1], ctx.currentTime + 0.01, 0.12);
+        const ph = wrap(B.phase);
+        B.lock.push(ph); if (B.lock.length > 6) B.lock.shift();
+        B.phase -= 0.45 * Math.sin(ph);                                   // phase reset towards the peak
+        const iv = B.lastBeat === null ? B.interval : t - B.lastBeat; B.lastBeat = t;
+        B.f += 0.35 * (1 / Math.max(0.25, iv) - B.f);                     // retune to the beat rate
+        B.a = Math.min(1, B.a + 0.04 + 0.12 * Math.cos(ph));
+        B.marks.push({ t, color: cssVar('--b') });
+        updateSync();
+      }
+      const jit = B.mode === 'wobbly' ? (Math.random() * 2 - 1) * 0.22 : 0;
+      B.nextBeat = t + B.interval + jit;
+    }
+    B.samples.push({ t: simT, v: B.a * Math.cos(B.phase) });
+    trim(B.samples, 4.2); trim(B.marks, 4.2);
+  }
+  function startBeat() { ensureCtx(); Object.assign(beat, { running: true, nextBeat: simT + 0.3, lastBeat: null, lock: [], holdMsg: 0 }); beatStartBtn.textContent = 'Stop the beat'; beatSkipBtn.disabled = false; syncText.textContent = 'Listening…'; }
+  function stopBeat() { beat.running = false; beatStartBtn.textContent = 'Start the beat'; beatSkipBtn.disabled = true; }
+  beatStartBtn.addEventListener('click', () => beat.running ? stopBeat() : startBeat());
+  beatSkipBtn.addEventListener('click', () => { beat.skipNext = true; });
+
+  // Push the swing: sounds near the peak grow the wave, near the dip shrink it
+  const swing = { phase: 0, f: 0.75, a: 0.45, auto: 'off', samples: [], marks: [] };
+  const swingText = $('#swingText');
+  function push(ph, auto) {
+    ensureCtx(); beep(freqsFor(BASE, 4)[2], ctx.currentTime + 0.01, 0.12);
+    const k = Math.cos(ph);
+    swing.a = Math.max(0.08, Math.min(1, swing.a + 0.14 * k));
+    swing.marks.push({ t: simT, color: cssVar(k > 0.5 ? '--a' : k < -0.3 ? '--c' : '--b') });
+    if (auto) swingText.textContent = swing.auto === 'peaks' ? 'The computer plays a sound at every peak. Watch the wave grow.' : 'The computer plays a sound at every dip. Watch the wave shrink.';
+    else swingText.textContent = k > 0.5 ? 'Nice timing! That was near the peak, so the wave grew.' : k < -0.3 ? 'That was near the dip, so the wave shrank.' : 'Close. Try pressing right at the top.';
+  }
+  function stepSwing(dt) {
+    const S = swing, prev = wrap(S.phase);
+    S.phase += TAU * S.f * dt;
+    const ph = wrap(S.phase);
+    S.a += (0.4 - S.a) * 0.12 * dt;
+    if (S.auto === 'peaks' && prev < 0 && ph >= 0) push(ph, true);
+    if (S.auto === 'troughs' && prev > 2 && ph < -2) push(ph, true);
+    S.samples.push({ t: simT, v: S.a * Math.cos(S.phase) });
+    trim(S.samples, 5.2); trim(S.marks, 5.2);
+  }
+  $('#swingTap').addEventListener('click', () => push(wrap(swing.phase), false));
+
+  function setupSeg(el, cb) {
+    const btns = [...el.querySelectorAll('button')];
+    btns.forEach(b => b.addEventListener('click', () => { btns.forEach(x => x.setAttribute('aria-checked', String(x === b))); cb(b.dataset.val); }));
+  }
+  setupSeg($('#beatSeg'), v => { beat.mode = v; beat.lock = []; });
+  setupSeg($('#swingSeg'), v => { swing.auto = v; swingText.textContent = v === 'off' ? 'Press “Play a sound” when the wave is at its peak.' : 'Watching the wave…'; });
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - lastFrame) / 1000 || 0); lastFrame = now; simT += dt;
+    stepBeat(dt); stepSwing(dt);
+    drawTrace(beatCv, beat.samples, beat.marks, simT, 4);
+    drawTrace(swingCv, swing.samples, swing.marks, simT, 5);
+    raf = requestAnimationFrame(frame);
+  }
+  function startBrain() { if (raf) return; lastFrame = performance.now(); raf = requestAnimationFrame(frame); }
+  function stopBrain() { if (raf) cancelAnimationFrame(raf); raf = 0; if (beat.running) stopBeat(); }
+
+  document.querySelectorAll('[data-brain]').forEach(b => b.addEventListener('click', () => show('brain')));
+  document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', () => { lastSavedId = null; renderBoards(); show('start'); }));
+  document.addEventListener('keydown', e => {
+    if ($('#brain').hidden || e.key !== ' ' || e.target.matches('button, input, textarea')) return;
+    e.preventDefault(); push(wrap(swing.phase), false);
+  });
+
   renderBoards();
+  if (location.hash === '#brain') show('brain');
 })();
 </script>
 </body>
