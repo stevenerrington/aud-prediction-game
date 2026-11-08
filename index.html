@@ -309,6 +309,7 @@ h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.35rem;marg
       <input id="nameInput" maxlength="16" autocomplete="off" placeholder="Your name for the leaderboard" aria-label="Your name">
       <button class="btn" type="submit">Save score</button>
     </form>
+    <p class="small" id="saveNote" aria-live="polite" style="margin:.6rem 0 0"></p>
     <div class="row" style="margin-top:1.25rem">
       <button class="btn" id="againBtn">Play again</button>
       <button class="btn ghost" id="menuBtn">Change mode</button>
@@ -482,39 +483,111 @@ h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.35rem;marg
   const params = L => M().params(L);
   const needFor = L => L === 1 ? 2 : 3;
 
-  // ---------- leaderboard (this device) ----------
+  // ---------- leaderboard ----------
+  // Online leaderboard (Supabase). Leave both blank to keep scores on this device only.
+  const SUPABASE_URL = 'https://iwtecamwulgjqgtkdjxs.supabase.co';   // e.g. 'https://abcdefghijkl.supabase.co'
+  const SUPABASE_KEY = 'sb_publishable_DKLspbAskwkUI-WcolpeYQ_yHT6nKRS';   // the project's publishable key (sb_publishable_...) or legacy anon key
+  const ONLINE = !!(SUPABASE_URL && SUPABASE_KEY);
+
+  // on-device board (always kept, used as the offline fallback)
   const keyFor = m => m === 'hard' ? 'what-comes-next:leaderboard' : 'what-comes-next:leaderboard:easy';
   const memBoards = { easy: [], hard: [] };
   function loadBoard() { try { const v = JSON.parse(localStorage.getItem(keyFor(mode))); if (Array.isArray(v)) return v; } catch (e) {} return memBoards[mode]; }
   function saveBoard(list) { memBoards[mode] = list; try { localStorage.setItem(keyFor(mode), JSON.stringify(list)); } catch (e) {} }
+
+  // online board
+  function sbHeaders() {
+    const h = { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' };
+    if (!SUPABASE_KEY.startsWith('sb_')) h.Authorization = 'Bearer ' + SUPABASE_KEY;   // legacy anon key
+    return h;
+  }
+  async function sbFetch(path, opts = {}) {
+    const ctrl = new AbortController(), to = setTimeout(() => ctrl.abort(), 6000);
+    try {
+      const r = await fetch(SUPABASE_URL + '/rest/v1/' + path, { ...opts, headers: { ...sbHeaders(), ...(opts.headers || {}) }, signal: ctrl.signal });
+      if (!r.ok) { const err = new Error('HTTP ' + r.status); err.status = r.status; throw err; }
+      return r.status === 204 ? null : r.json();
+    } finally { clearTimeout(to); }
+  }
+  const onlineCache = { easy: null, hard: null };
+  const onlineStatus = { easy: 'idle', hard: 'idle' };   // idle | loading | ok | failed
+  async function fetchOnline(m) {
+    try {
+      onlineCache[m] = await sbFetch('scores?select=id,name,score,level&mode=eq.' + m + '&order=score.desc,created_at.asc&limit=10');
+      onlineStatus[m] = 'ok';
+    } catch (e) { onlineStatus[m] = onlineCache[m] ? 'ok' : 'failed'; }
+  }
+  async function postOnline(entry) {
+    const rows = await sbFetch('scores', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(entry) });
+    return rows && rows[0];
+  }
+  // scores that couldn't be sent (e.g. no wifi) are queued and retried later
+  const PENDING = 'what-comes-next:pending';
+  const loadPending = () => { try { return JSON.parse(localStorage.getItem(PENDING)) || []; } catch (e) { return []; } };
+  const savePending = l => { try { localStorage.setItem(PENDING, JSON.stringify(l)); } catch (e) {} };
+  const isPermanent = e => e.status >= 400 && e.status < 500 && e.status !== 408 && e.status !== 429;
+  let flushing = null;
+  function flushPending() {
+    if (!ONLINE) return Promise.resolve();
+    if (flushing) return flushing;
+    flushing = (async () => {
+      const left = [];
+      for (const p of loadPending()) { try { await postOnline(p); } catch (e) { if (!isPermanent(e)) left.push(p); } }
+      savePending(left);
+    })().finally(() => { flushing = null; });
+    return flushing;
+  }
+
+  // a light name filter for a kids' audience (moderate properly in Supabase)
+  const BLOCK = ['fuck', 'shit', 'cunt', 'bitch', 'twat', 'wank', 'bastard', 'slag', 'nazi', 'prick', 'piss', 'nigg', 'fag', 'retard', 'porn', 'penis', 'vagina', 'tits', 'boob', 'arse', 'dick', 'cock', 'sex'];
+  const LEET = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '@': 'a', '$': 's', '!': 'i' };
+  const rudeName = n => { const s = n.toLowerCase().replace(/[013457@$!]/g, c => LEET[c]).replace(/[^a-z]/g, ''); return BLOCK.some(w => s.includes(w)); };
+
   let lastSavedId = null;
-  function renderBoards() {
-    const list = loadBoard();
-    document.querySelectorAll('[data-board-title]').forEach(h => h.textContent = 'Best ' + M().label.toLowerCase() + ' scores on this device');
+  function currentList() {
+    if (ONLINE && onlineStatus[mode] === 'ok') return { list: onlineCache[mode], source: 'online' };
+    return { list: loadBoard(), source: 'local' };
+  }
+  function drawBoards() {
+    const { list, source } = currentList();
+    const lbl = M().label.toLowerCase();
+    document.querySelectorAll('[data-board-title]').forEach(h => h.textContent = source === 'online' ? 'Top ' + lbl + ' scores' : 'Best ' + lbl + ' scores on this device');
     document.querySelectorAll('[data-board]').forEach(host => {
       host.textContent = '';
-      if (!list.length) {
-        const p = document.createElement('p'); p.className = 'empty';
-        p.textContent = 'No scores yet. Yours could be the first.'; host.appendChild(p); return;
+      const para = (cls, t) => { const p = document.createElement('p'); p.className = cls; p.textContent = t; return p; };
+      if (ONLINE && onlineStatus[mode] === 'loading') { host.appendChild(para('empty', 'Loading the leaderboard…')); return; }
+      if (!list.length) host.appendChild(para('empty', 'No scores yet. Yours could be the first.'));
+      else {
+        const ol = document.createElement('ol');
+        list.forEach((e, i) => {
+          const li = document.createElement('li'); if (e.id === lastSavedId) li.className = 'new';
+          const cells = [['rk', i + 1], ['nm', e.name], ['lv', 'Level ' + e.level], ['sc', e.score]];
+          cells.forEach(([c, t]) => { const s = document.createElement('span'); s.className = c; s.textContent = t; li.appendChild(s); });
+          ol.appendChild(li);
+        });
+        host.appendChild(ol);
       }
-      const ol = document.createElement('ol');
-      list.forEach((e, i) => {
-        const li = document.createElement('li'); if (e.id === lastSavedId) li.className = 'new';
-        const cells = [['rk', i + 1], ['nm', e.name], ['lv', 'Level ' + e.level], ['sc', e.score]];
-        cells.forEach(([c, t]) => { const s = document.createElement('span'); s.className = c; s.textContent = t; li.appendChild(s); });
-        ol.appendChild(li);
-      });
-      host.appendChild(ol);
-      const foot = document.createElement('div'); foot.className = 'foot';
-      const clr = document.createElement('button'); clr.className = 'linkish'; clr.textContent = 'Clear scores';
-      clr.addEventListener('click', () => {
-        if (clr.dataset.armed) { saveBoard([]); lastSavedId = null; renderBoards(); }
-        else { clr.dataset.armed = '1'; clr.textContent = 'Tap again to clear all scores'; setTimeout(() => { if (clr.isConnected) { delete clr.dataset.armed; clr.textContent = 'Clear scores'; } }, 3000); }
-      });
-      foot.appendChild(clr); host.appendChild(foot);
+      if (source === 'online') { const p = para('small', 'Names on this board are public, so please use a nickname rather than your full name.'); p.style.margin = '.75rem 0 0'; host.appendChild(p); }
+      else if (ONLINE) { const p = para('small', 'Couldn’t reach the online leaderboard, so these are the scores saved on this device.'); p.style.margin = '.75rem 0 0'; host.appendChild(p); }
+      if (source === 'local' && list.length) {
+        const foot = document.createElement('div'); foot.className = 'foot';
+        const clr = document.createElement('button'); clr.className = 'linkish'; clr.textContent = 'Clear scores';
+        clr.addEventListener('click', () => {
+          if (clr.dataset.armed) { saveBoard([]); lastSavedId = null; renderBoards(); }
+          else { clr.dataset.armed = '1'; clr.textContent = 'Tap again to clear all scores'; setTimeout(() => { if (clr.isConnected) { delete clr.dataset.armed; clr.textContent = 'Clear scores'; } }, 3000); }
+        });
+        foot.appendChild(clr); host.appendChild(foot);
+      }
     });
   }
-  const qualifies = s => { const l = loadBoard(); return s > 0 && (l.length < 10 || s > l[l.length - 1].score); };
+  function renderBoards() {
+    if (ONLINE && !onlineCache[mode] && onlineStatus[mode] !== 'failed') onlineStatus[mode] = 'loading';
+    drawBoards();
+    if (!ONLINE) return;
+    const m = mode;
+    flushPending().then(() => fetchOnline(m)).then(() => { if (m === mode) drawBoards(); });
+  }
+  const qualifies = s => { const l = currentList().list; return s > 0 && (l.length < 10 || s > l[l.length - 1].score); };
 
   // ---------- game state ----------
   let level, score, lives, correctInLevel, q, accepting = false, rtStart = 0, timers = [];
@@ -639,6 +712,7 @@ h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.35rem;marg
     const form = $('#saveForm');
     form.hidden = !qualifies(score);
     $('#nameInput').value = '';
+    $('#saveNote').textContent = '';
     const f = pick(FACTS);
     $('#fact').textContent = '';
     const fb = document.createElement('b'); fb.textContent = 'Brain fact: ';
@@ -667,13 +741,27 @@ h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1.35rem;marg
     if (!accepting || q.replays >= M().replays) return;
     q.replays++; q.replayed = true; playSeq();
   });
-  $('#saveForm').addEventListener('submit', e => {
+  $('#saveForm').addEventListener('submit', async e => {
     e.preventDefault();
+    const note = $('#saveNote');
     const name = ($('#nameInput').value.trim() || 'Player').slice(0, 16);
+    if (rudeName(name)) { note.textContent = 'Please choose a different name.'; return; }
     const id = Date.now() + '-' + rnd(1e6);
     const list = [...loadBoard(), { id, name, score, level }].sort((a, b) => b.score - a.score).slice(0, 10);
     saveBoard(list); lastSavedId = id;
     $('#saveForm').hidden = true;
+    if (ONLINE) {
+      const entry = { name, score, level, mode };
+      note.textContent = 'Saving…';
+      try {
+        const row = await postOnline(entry);
+        if (row) lastSavedId = row.id;
+        note.textContent = 'Saved to the online leaderboard.';
+      } catch (err) {
+        if (isPermanent(err)) note.textContent = 'The online leaderboard didn’t accept that score, but it’s saved on this device.';
+        else { savePending([...loadPending(), entry]); note.textContent = 'Couldn’t reach the online leaderboard. Your score is saved on this device and will be sent when the connection is back.'; }
+      }
+    }
     renderBoards();
   });
   document.addEventListener('keydown', e => {
